@@ -70,7 +70,6 @@ class CtlAccessibilityService : AccessibilityService() {
                                 result = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP)
                             }
                             buffer.close()
-                            screenshot.close()
                         } catch (e: Exception) {
                             result = ""
                         } finally {
