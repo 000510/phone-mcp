@@ -55,7 +55,7 @@ object McpServerHolder {
         synchronized(this) {
             if (server != null) return
             try {
-                server = McpServer(8765).also { it.start(SOCKET_READ_TIMEOUT, false) }
+                server = McpServer(8765).also { it.start(5000, false) }
                 lastError = null
             } catch (e: Exception) {
                 lastError = "${e.javaClass.simpleName}: ${e.message}"
