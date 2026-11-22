@@ -55,9 +55,10 @@ class CtlAccessibilityService : AccessibilityService() {
                 android.view.Display.DEFAULT_DISPLAY,
                 mainExecutor,
                 object : TakeScreenshotCallback {
-                    override fun onSuccess(screenshot: android.graphics.HardwareBuffer) {
+                    override fun onSuccess(screenshot: ScreenshotResult) {
                         try {
-                            val bmp = Bitmap.wrapHardwareBuffer(screenshot, null)
+                            val buffer = screenshot.hardwareBuffer
+                            val bmp = Bitmap.wrapHardwareBuffer(buffer, null)
                             if (bmp == null) {
                                 result = ""
                             } else {
@@ -68,7 +69,8 @@ class CtlAccessibilityService : AccessibilityService() {
                                 soft.recycle()
                                 result = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP)
                             }
-                            screenshot.close()
+                            buffer.close()
+                            screenshot.recycle()
                         } catch (e: Exception) {
                             result = ""
                         } finally {
@@ -76,7 +78,7 @@ class CtlAccessibilityService : AccessibilityService() {
                         }
                     }
 
-                    override fun onError(errorCode: Int) {
+                    override fun onFailure(errorCode: Int) {
                         result = ""
                         latch.countDown()
                     }
