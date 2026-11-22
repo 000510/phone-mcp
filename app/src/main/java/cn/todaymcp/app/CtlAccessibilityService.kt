@@ -53,15 +53,24 @@ class CtlAccessibilityService : AccessibilityService() {
         mainHandler.post {
             takeScreenshot(
                 mainExecutor,
-                { res ->
+                java.util.function.Consumer<AccessibilityService.ScreenshotResult> { res ->
                     try {
-                        val hardwareBitmap = res?.bitmap
-                        if (hardwareBitmap == null) {
+                        val buffer = res?.hardwareBuffer
+                        if (buffer == null) {
                             result = ""
                         } else {
-                            val bos = ByteArrayOutputStream()
-                            hardwareBitmap.compress(Bitmap.CompressFormat.PNG, 80, bos)
-                            result = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP)
+                            val bmp = Bitmap.wrapHardwareBuffer(buffer, null)
+                            if (bmp == null) {
+                                result = ""
+                            } else {
+                                val soft = bmp.copy(Bitmap.Config.ARGB_8888, false)
+                                bmp.recycle()
+                                val bos = ByteArrayOutputStream()
+                                soft.compress(Bitmap.CompressFormat.PNG, 80, bos)
+                                soft.recycle()
+                                result = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP)
+                            }
+                            buffer.close()
                         }
                     } catch (e: Exception) {
                         result = ""

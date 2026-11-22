@@ -193,7 +193,7 @@ class McpServer(port: Int) : NanoHTTPD("127.0.0.1", port) {
         pm.getInstalledPackages(0).take(500).forEach {
             arr.put(JSONObject()
                 .put("package_name", it.packageName)
-                .put("app_name", it.applicationInfo.loadLabel(pm).toString()))
+                .put("app_name", it.applicationInfo!!.loadLabel(pm).toString()))
         }
         return textResult(arr.toString())
     }
