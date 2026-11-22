@@ -11,8 +11,8 @@ android {
         applicationId "cn.todaymcp.app"
         minSdk 30          // Android 11 起（你手机是 Android 16，没问题）
         targetSdk 36
-        versionCode 2
-        versionName "0.2.0"
+        versionCode 3
+        versionName "0.3.0"
     }
 
     signingConfigs {

@@ -147,7 +147,12 @@ class MainActivity : android.app.Activity() {
                 status.text = buildString {
                     append(if (a11y) "✅ 无障碍服务：已开启" else "❌ 无障碍服务：未开启")
                     append("\n")
-                    append(if (http) "✅ MCP 服务：http://127.0.0.1:8765/mcp 运行中" else "❌ MCP 服务：未运行（点下面按钮启动）")
+                    if (http) {
+                        append("✅ MCP 服务：http://127.0.0.1:8765/mcp 运行中")
+                    } else {
+                        append("❌ MCP 服务：未运行")
+                        McpServerHolder.lastError?.let { append("\n（启动错误：$it）") }
+                    }
                 }
             }
         }.start()

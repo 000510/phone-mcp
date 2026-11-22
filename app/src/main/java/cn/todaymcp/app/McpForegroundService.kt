@@ -45,12 +45,22 @@ object McpServerHolder {
     @Volatile
     private var server: McpServer? = null
 
+    /** 最近一次启动失败的错误信息，供界面展示 */
+    @Volatile
+    var lastError: String? = null
+        private set
+
     fun start(context: android.content.Context) {
         if (server != null) return
-        try {
-            server = McpServer(8765).also { it.start() }
-        } catch (e: Exception) {
-            android.util.Log.e("McpServerHolder", "start failed", e)
+        synchronized(this) {
+            if (server != null) return
+            try {
+                server = McpServer(8765).also { it.start(SOCKET_READ_TIMEOUT, false) }
+                lastError = null
+            } catch (e: Exception) {
+                lastError = "${e.javaClass.simpleName}: ${e.message}"
+                android.util.Log.e("McpServerHolder", "start failed", e)
+            }
         }
     }
 }
