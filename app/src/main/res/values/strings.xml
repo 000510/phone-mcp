@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">手机MCP</string>
+    <string name="a11y_label">手机MCP 无障碍服务</string>
+    <string name="a11y_desc">供 AI（MCP 客户端）识别屏幕内容并模拟点击、滑动、输入。数据仅在本机回环地址传输。</string>
+</resources>
