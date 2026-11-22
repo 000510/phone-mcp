@@ -52,6 +52,7 @@ class CtlAccessibilityService : AccessibilityService() {
         var result: String? = null
         mainHandler.post {
             takeScreenshot(
+                android.view.Display.DEFAULT_DISPLAY,
                 mainExecutor,
                 java.util.function.Consumer<AccessibilityService.ScreenshotResult> { res ->
                     try {
