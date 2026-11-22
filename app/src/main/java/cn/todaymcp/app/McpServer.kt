@@ -12,6 +12,20 @@ import org.json.JSONObject
  */
 class McpServer(port: Int) : NanoHTTPD("127.0.0.1", port) {
 
+    companion object {
+        /** 访问密钥：公网隧道地址 + 该密钥才可访问 */
+        const val ACCESS_KEY = "tmc-27f1a9"
+    }
+
+    /** 密钥校验：/mcp/<key> 或 /mcp?key=<key> */
+    private fun isAuthorized(session: IHTTPSession): Boolean {
+        if ((session.uri ?: "") == "/mcp/$ACCESS_KEY") return true
+        return session.queryParameterString
+            .split('&')
+            .mapNotNull { it.split('=', limit = 2).takeIf { p -> p.size == 2 } }
+            .any { it[0] == "key" && it[1] == ACCESS_KEY }
+    }
+
     private val serverInfo = JSONObject()
         .put("name", "phone-mcp")
         .put("version", "0.1.0")
@@ -80,6 +94,13 @@ class McpServer(port: Int) : NanoHTTPD("127.0.0.1", port) {
                 addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Mcp-Session-Id")
             }
         }
+
+        // 访问密钥校验（公网隧道暴露时的保护）：/mcp/KEY 或 /mcp?key=KEY
+        if (!isAuthorized(session)) {
+            return newFixedLengthResponse(Response.Status.FORBIDDEN, "application/json",
+                JSONObject().put("error", "invalid key").toString())
+        }
+
         if (session.method == Method.GET) {
             // 信息页
             val info = JSONObject()
@@ -88,7 +109,7 @@ class McpServer(port: Int) : NanoHTTPD("127.0.0.1", port) {
                 .put("status", CtlAccessibilityService.instance != null)
             return newFixedLengthResponse(Response.Status.OK, "application/json", info.toString())
         }
-        if (session.uri != "/mcp") {
+        if (session.uri != "/mcp" && !(session.uri ?: "").startsWith("/mcp/")) {
             return newFixedLengthResponse(Response.Status.NOT_FOUND, "application/json",
                 JSONObject().put("error", "use /mcp").toString())
         }

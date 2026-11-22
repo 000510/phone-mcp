@@ -137,7 +137,7 @@ class MainActivity : android.app.Activity() {
         Thread {
             var http = false
             try {
-                val conn = java.net.URL("http://127.0.0.1:8765/mcp").openConnection() as java.net.HttpURLConnection
+                val conn = java.net.URL("http://127.0.0.1:8765/mcp/${McpServer.ACCESS_KEY}").openConnection() as java.net.HttpURLConnection
                 conn.requestMethod = "GET"
                 conn.connectTimeout = 1000
                 http = conn.responseCode == 200
