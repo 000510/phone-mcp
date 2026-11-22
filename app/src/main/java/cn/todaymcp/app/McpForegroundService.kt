@@ -15,18 +15,25 @@ class McpForegroundService : Service() {
         super.onCreate()
         val channelId = "mcp_server"
         val nm = getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            nm.createNotificationChannel(
-                NotificationChannel(channelId, "MCP 服务", NotificationManager.IMPORTANCE_LOW)
-            )
-            startForeground(
-                1,
-                Notification.Builder(this, channelId)
-                    .setContentTitle("手机MCP 运行中")
-                    .setContentText("本机 127.0.0.1:8765/mcp 服务已开启")
-                    .setSmallIcon(android.R.drawable.ic_menu_manage)
-                    .build()
-            )
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                nm.createNotificationChannel(
+                    NotificationChannel(channelId, "MCP 服务", NotificationManager.IMPORTANCE_LOW)
+                )
+                startForeground(
+                    1,
+                    Notification.Builder(this, channelId)
+                        .setContentTitle("手机MCP 运行中")
+                        .setContentText("本机 127.0.0.1:8765/mcp 服务已开启")
+                        .setSmallIcon(android.R.drawable.ic_menu_manage)
+                        .build()
+                )
+            } else {
+                startForeground(1, Notification.Builder(this).build())
+            }
+        } catch (e: Exception) {
+            // 通知/前台化失败不阻止服务器启动
+            android.util.Log.w("McpFGS", "startForeground failed", e)
         }
         McpServerHolder.start(this)
     }
